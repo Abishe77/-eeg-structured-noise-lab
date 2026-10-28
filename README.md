@@ -44,22 +44,18 @@ There is always unexplained variation.
 
 A simple model might treat that variation as independent noise:
 
-\[
-y = Gx + \epsilon
-\]
+**y = Gx + ε**
 
 where:
 
-- \(y\) is the measured EEG
-- \(x\) is the unknown source
-- \(G\) is the forward model connecting source to electrodes
-- \(\epsilon\) represents measurement uncertainty
+- **y** is the measured EEG
+- **x** is the unknown source
+- **G** is the forward model connecting source to electrodes
+- **ε** represents measurement uncertainty
 
 The usual simplified assumption is:
 
-\[
-\epsilon \sim N(0,\sigma^2I)
-\]
+**ε ~ N(0, σ²I)**
 
 which essentially says:
 
@@ -71,11 +67,9 @@ If two nearby electrodes tend to fluctuate together, or if some measurement devi
 
 A more general model is:
 
-\[
-\epsilon \sim N(0,\Sigma)
-\]
+**ε ~ N(0, Σ)**
 
-where \(\Sigma\) describes how the uncertainty varies and how different measurements are related.
+where **Σ** describes how the uncertainty varies and how different measurements are related.
 
 That leads to the central idea of this project:
 
@@ -119,33 +113,25 @@ The two pieces are then connected by transferring the empirically observed corre
 
 # 3. The modelling idea
 
-For a candidate source \(x\), the forward model predicts what the electrodes should measure:
+For a candidate source **x**, the forward model predicts what the electrodes should measure:
 
-\[
-\hat y = Gx
-\]
+**ŷ = Gx**
 
-The inverse problem compares the actual measurement \(y\) against predictions from many possible source locations.
+The inverse problem compares the actual measurement **y** against predictions from many possible source locations.
 
 With independent-noise assumptions, the project uses an ordinary error measure:
 
-\[
-\text{RMSE}(y,\hat y)
-\]
+**RMSE(y, ŷ)**
 
 The candidate with the smallest error is selected.
 
 With a covariance model, the residual is evaluated using:
 
-\[
-e^T\Sigma^{-1}e
-\]
+**eᵀΣ⁻¹e**
 
 where:
 
-\[
-e = y-\hat y
-\]
+**e = y − ŷ**
 
 This changes the question from:
 
@@ -233,7 +219,7 @@ The experiment uses:
 
 - sphere radius: 3
 - 8 electrodes
-- true source: \([1,2,1]\)
+- true source: **[1, 2, 1]**
 - 93 candidate source locations
 - noise standard deviation: 0.1
 - 10,000 calibration trials
@@ -265,26 +251,17 @@ The next experiment deliberately introduces spatially correlated uncertainty.
 
 Instead of:
 
-\[
-\Sigma=\sigma^2I
-\]
+**Σ = σ²I**
 
 the simulator constructs a covariance matrix whose entries depend on electrode separation:
 
-\[
-\Sigma_{ij}
-=
-\sigma^2
-\exp\left(
--\frac{d_{ij}}{\ell}
-\right)
-\]
+**Σᵢⱼ = σ² exp(−dᵢⱼ / ℓ)**
 
 where:
 
-- \(d_{ij}\) is the distance between electrodes \(i\) and \(j\)
-- \(\ell\) is a correlation-length parameter
-- \(\sigma\) controls the overall noise scale
+- **dᵢⱼ** is the distance between electrodes
+- **ℓ** is a correlation-length parameter
+- **σ** controls the overall noise scale
 
 Intuitively:
 
@@ -329,17 +306,11 @@ The dataset contains:
 - 72 matching trials
 - 59 usable EEG channels
 - 421 time points per epoch
-- epochs from -0.2 s to +0.5 s around the event
+- epochs from −0.2 s to +0.5 s around the event
 
 For each trial, the across-trial average response is removed:
 
-\[
-r_{trial}(t)
-=
-y_{trial}(t)
--
-\bar y(t)
-\]
+**rₜᵣᵢₐₗ(t) = yₜᵣᵢₐₗ(t) − ȳ(t)**
 
 These residuals represent the trial-to-trial variability that remains after removing the average event-related response.
 
@@ -367,10 +338,10 @@ The difference between the real and null covariance structure is examined at sev
 
 | Time | Real covariance reproducibility | Shuffled null | Difference |
 |---:|---:|---:|---:|
-| -0.200 s | 0.2579 ± 0.0539 | -0.0112 ± 0.0171 | 0.2691 |
+| −0.200 s | 0.2579 ± 0.0539 | −0.0112 ± 0.0171 | 0.2691 |
 | 0.000 s | 0.5977 ± 0.0297 | 0.0007 ± 0.0145 | 0.5970 |
-| +0.133 s | 0.5552 ± 0.0165 | -0.0017 ± 0.0236 | 0.5569 |
-| +0.300 s | 0.1536 ± 0.0219 | -0.0090 ± 0.0223 | 0.1627 |
+| +0.133 s | 0.5552 ± 0.0165 | −0.0017 ± 0.0236 | 0.5569 |
+| +0.300 s | 0.1536 ± 0.0219 | −0.0090 ± 0.0223 | 0.1627 |
 | +0.499 s | 0.8212 ± 0.0294 | 0.0054 ± 0.0232 | 0.8158 |
 
 The real residual covariance structure is substantially more reproducible than the shuffled null in these tested windows.
@@ -393,16 +364,12 @@ That structure is then transferred into the simulator.
 
 The bridge covariance is constructed as:
 
-\[
-\Sigma_{\text{bridge}}
-=
-\sigma_{\text{sim}}^2R_{\text{EEG}}
-\]
+**Σ_bridge = σ²_sim R_EEG**
 
 where:
 
-- \(R_{\text{EEG}}\) is the correlation structure estimated from real EEG residuals
-- \(\sigma_{\text{sim}}\) sets the simulator's noise scale
+- **R_EEG** is the correlation structure estimated from real EEG residuals
+- **σ_sim** sets the simulator's noise scale
 
 The simulator still knows the true source.
 
@@ -467,7 +434,7 @@ Reproducible spatial covariance observed
         ↓
 Empirical covariance transferred to simulator
         ↓
-Covariance-aware localization improves again
+Covariance-aware localization improves
 ```
 
 This progression is intentional.
